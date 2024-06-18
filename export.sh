@@ -1,3 +1,9 @@
+ADDITIONAL_FIELDS=$1
+if [ $# -eq 1 ]
+then
+        ADDITIONAL_FIELDS=$1", "
+fi
+
 types=("deployments" "services" "configmaps" "secrets" "pods" "routes")
 
 # Create a directory to store the YAML files
@@ -19,6 +25,6 @@ for type in "${types[@]}"; do
     #get the yaml for the resource itself
     oc get "$type" "$resource" -o yaml > "export/$type/${resource}.yaml"
     #use yq to get rid of all of the runtime information
-    yq eval 'del(.metadata.creationTimestamp, .metadata.generation, .metadata.resourceVersion, .metadata.selfLink, .metadata.uid, .metadata.managedFields, .status)' -i "$export_file"
+    yq eval 'del('$ADDITIONAL_FIELDS'.metadata.creationTimestamp, .metadata.generation, .metadata.resourceVersion, .metadata.selfLink, .metadata.uid, .metadata.managedFields, .status)' -i "$export_file"
   done
 done
