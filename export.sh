@@ -36,7 +36,7 @@ while getopts ":hn:c:V" option; do
          Help
          exit;;
       n) # Specify the namespace to export from
-         NAMESPACEARG=$("-n $OPTARG");;
+         NAMESPACEARG="-n $OPTARG";;
       c) # Specify the namespace to export from
          ADDITIONAL_FIELDS=$OPTARG", ";;
       V) #debug statements
