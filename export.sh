@@ -1,3 +1,5 @@
+#!/bin/sh
+
 Help()
 {
    # Display Help
@@ -53,10 +55,9 @@ mkdir -p export
 
 # Loop through each resource type and export the YAML
 for type in "${types[@]}"; do
-  
   echo "Exporting ${type}..."
   #get all the resources that are in each type listed in the types array
-  resources="$(oc get $type $NAMESPACEARG -o custom-columns=DEP:.metadata.name --no-headers)"
+  eval "resources=\$(oc get $type $NAMESPACEARG -o custom-columns=DEP:.metadata.name --no-headers)"
   #Tokenize on the eol character
   IFS=$'\n' resources1=($resources)
   #make the type root directory
@@ -66,7 +67,8 @@ for type in "${types[@]}"; do
     export_file="export/$type/${resource}.yaml"
     echo "-------exporting name $resource to $export_file"
     #get the yaml for the resource itself
-    oc get "$type" "$resource" $NAMESPACEARG -o yaml > "export/$type/${resource}.yaml"
+    cmd="oc get $type $resource $NAMESPACEARG -o yaml > export/$type/${resource}.yaml"
+    sh -c "$cmd"
     #use yq to get rid of all of the runtime information
     yq eval 'del('$ADDITIONAL_FIELDS'.metadata.creationTimestamp, .metadata.generation, .metadata.resourceVersion, .metadata.selfLink, .metadata.uid, .metadata.managedFields, .status)' -i "$export_file"
   done
