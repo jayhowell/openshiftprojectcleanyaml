@@ -5,18 +5,30 @@ Help()
    echo
    echo "Syntax: export.sh [-h|n|c|r|d]"
    echo "options:"
-   echo "h     Print this Help."
-   echo "n     Specify the namespace to export from"
-   echo "c     Add additional Clean up elements in the Yaml"
-   echo "r     Add additional Resource Types(resource included are deployments,services,configmaps,secrets,pods, androutes)"
-   echo "d     echos all commands being run. "
+   echo "-h     Print this Help."
+   echo "-n     Namespace to export from"
+   echo "-c     Additional yaml cleanup elements.  Arguments must have a period at the beginning and must have a comma and a space separating elements."
+   echo "-r     Resource Types(resource included are deployments,services,configmaps,secrets,pods, androutes)"
+   echo "-V     Verbose - echos all commands being run. "
+   echo
+   echo "All yaml files will be placed in the ./export directory"
+   echo
+   echo "EXAMPLES:"
+   echo "Export the yaml from the book-import namespace and delete all annotations(.metadata.annotations) in the yaml"
+   echo "./export.sh -c .metadata.annotations -n book-import"
+   echo 
+   echo "Export the yaml from the current project and delete these tags in the yaml '.metadata.annotations,.metadata.labels,.metadata.namespace,.spec.strategy'"
+   echo "./export.sh -c '.metadata.annotations,.metadata.labels,.metadata.namespace,.spec.strategy' "
+   echo
+   echo "Export the default resource types(deployments,services,configmaps,secrets,pods, androutes) from the current project"
+   echo "./export.sh"
 
    echo
 }
 
 
 # Get the options
-while getopts ":hn:c:d" option; do
+while getopts ":hn:c:V" option; do
    case $option in
       h) # display Help
          Help
@@ -25,7 +37,7 @@ while getopts ":hn:c:d" option; do
          NAMESPACEARG=$("-n $OPTARG");;
       c) # Specify the namespace to export from
          ADDITIONAL_FIELDS=$OPTARG", ";;
-      d) #debug statements
+      V) #debug statements
          set -x;;
      \?) # Invalid option
          echo "Error: Invalid option"
